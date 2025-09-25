@@ -1,0 +1,14 @@
+C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\deps\libserde-a8567a37de3b2e3b.rmeta: C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src/lib.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\integer128.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\mod.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\de.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\ser.rs C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\build\serde-c75e207ae1aa2e6a\out/private.rs
+
+C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\deps\libserde-a8567a37de3b2e3b.rlib: C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src/lib.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\integer128.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\mod.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\de.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\ser.rs C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\build\serde-c75e207ae1aa2e6a\out/private.rs
+
+C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\deps\serde-a8567a37de3b2e3b.d: C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src/lib.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\integer128.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\mod.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\de.rs C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\ser.rs C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\build\serde-c75e207ae1aa2e6a\out/private.rs
+
+C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src/lib.rs:
+C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\integer128.rs:
+C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\mod.rs:
+C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\de.rs:
+C:\Users\terex\.cargo\registry\src\index.crates.io-6f17d22bba15001f\serde-1.0.226\src\private\ser.rs:
+C:\Users\terex\Documents\lstregen\target\wasm32-unknown-unknown\release\build\serde-c75e207ae1aa2e6a\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\terex\\Documents\\lstregen\\target\\wasm32-unknown-unknown\\release\\build\\serde-c75e207ae1aa2e6a\\out

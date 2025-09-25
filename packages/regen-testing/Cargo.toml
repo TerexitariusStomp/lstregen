@@ -1,0 +1,21 @@
+[package]
+name = "regen-testing"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Regen Network"]
+description = "Testing utilities and mock queriers for Regen workspace"
+
+[lib]
+name = "regen_testing"
+path = "src/lib.rs"
+
+[features]
+default = []
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cw-multi-test = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }

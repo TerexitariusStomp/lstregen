@@ -1,0 +1,23 @@
+{
+  "name": "regen-liquid-staking-indexer",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node -r ts-node/register src/index.ts",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@cosmjs/cosmwasm-stargate": "^0.31.0",
+    "typeorm": "0.2.45",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

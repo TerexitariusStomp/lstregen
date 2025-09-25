@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts/rules.yml"
+
+scrape_configs:
+  - job_name: 'regen-liquid-staking'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'regen-node'
+    static_configs:
+      - targets: ['rpc.regen.network:26657']
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+
+  - job_name: 'validator-monitoring'
+    static_configs:
+      - targets: 
+          - 'validator1.example.com:26660'
+          - 'validator2.example.com:26660'
+    scrape_interval: 30s
+
+alertmanager_configs:
+  - static_configs:
+      - targets:
+        - alertmanager:9093

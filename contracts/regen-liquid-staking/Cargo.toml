@@ -1,0 +1,29 @@
+[package]
+name = "regen-liquid-staking"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Regen Network"]
+description = "Liquid staking contract for Regen Network"
+
+[lib]
+crate-type = ["cdylib","rlib"]
+
+[features]
+default = ["library"]
+library = []
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cosmwasm-storage = { workspace = true }
+cw-storage-plus = { workspace = true }
+cw2 = { workspace = true }
+cw20 = { workspace = true }
+cw-utils = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+cw-multi-test = { workspace = true }

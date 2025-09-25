@@ -1,0 +1,41 @@
+groups:
+  - name: liquid_staking_alerts
+    rules:
+      - alert: HighUnbondingQueue
+        expr: unbonding_queue_size > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High unbonding queue detected"
+          description: "Unbonding queue has {{ $value }} requests pending"
+
+      - alert: ValidatorSlashing
+        expr: validator_slashing_events > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Validator slashing detected"
+          description: "Validator {{ $labels.validator }} has been slashed"
+
+      - alert: LowContractBalance
+        expr: contract_balance_regen < 1000000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low contract balance"
+          description: "Contract balance is {{ $value }} uregen"
+
+      - alert: ExchangeRateAnomaly
+        expr: |
+          (
+            rate(exchange_rate_change[1h]) > 0.1
+          )
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Exchange rate changed dramatically"
+          description: "Exchange rate changed by {{ $value }}% in the last hour"

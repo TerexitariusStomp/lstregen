@@ -1,0 +1,20 @@
+[package]
+name = "regen-types"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Regen Network"]
+description = "Shared types for Regen Network liquid staking workspace"
+
+[lib]
+name = "regen_types"
+path = "src/lib.rs"
+
+[features]
+default = []
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
