@@ -10,6 +10,8 @@ pub struct InstantiateMsg {
     pub unbonding_period: u64,
     pub max_validators: u32,
     pub min_delegation: Uint128,
+    /// Optional at instantiate. If omitted, you must set it later via UpdateConfig.
+    pub dregen_token: Option<String>,
     pub validators: Vec<ValidatorParams>,
 }
 
@@ -42,6 +44,7 @@ pub enum ExecuteMsg {
         admin: Option<String>,
         fee_rate: Option<Decimal>,
         max_validators: Option<u32>,
+        dregen_token: Option<String>,
     },
 }
 

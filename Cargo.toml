@@ -3,6 +3,7 @@ members = [
     "contracts/*",
     "packages/*"
 ]
+resolver = "2"
 
 [workspace.dependencies]
 cosmwasm-std = "1.5.0"

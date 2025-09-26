@@ -1,0 +1,29 @@
+# Rust
+target/
+Cargo.lock
+
+# Build artifacts
+artifacts/
+
+# Keyrings and home directories
+.regen_keyring/
+.neutron_keyring/
+.regen_home/
+
+# Binaries and libraries
+libwasmvm.x86_64.so
+regen
+
+# Generated files
+rust-toolchain.toml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

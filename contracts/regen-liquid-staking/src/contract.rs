@@ -37,9 +37,16 @@ pub fn instantiate(
     }
 
     // Initialize contract configuration
+    let dregen_token_addr = if let Some(token) = msg.dregen_token {
+        deps.api.addr_validate(&token)?
+    } else {
+        // Default placeholder; must be updated later via UpdateConfig before first stake
+        admin.clone()
+    };
+
     let config = Config {
         admin: admin.clone(),
-        dregen_token: admin.clone(), // placeholder; updated after token creation
+        dregen_token: dregen_token_addr,
         fee_rate: msg.fee_rate,
         unbonding_period: msg.unbonding_period,
         max_validators: msg.max_validators,
@@ -107,7 +114,8 @@ pub fn execute(
             admin,
             fee_rate,
             max_validators,
-        } => execute_update_config(deps, env, info, admin, fee_rate, max_validators),
+            dregen_token,
+        } => execute_update_config(deps, env, info, admin, fee_rate, max_validators, dregen_token),
     }
 }
 

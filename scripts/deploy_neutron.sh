@@ -1,32 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NETWORK=${1:-mainnet}
-CHAIN_ID=${2:-regen-1}
-NODE_URL=${3:-https://rpc.regen.network:443}
-DEPLOYER_KEY=${4:-ops-deployer}
+NETWORK=${1:-test}
+CHAIN_ID=${2:-test-1}
+NODE_URL=${3:-tcp://neutron-node:26657}
+DEPLOYER_KEY=${4:-funded}
 
 echo "Deploying Regen Liquid Staking to $NETWORK ($CHAIN_ID) via $NODE_URL using key $DEPLOYER_KEY"
 
-# Regen CLI wrapper: use local binary if present, otherwise Docker image
-REGEN_IMAGE="${REGEN_IMAGE:-ghcr.io/regen-network/regen-ledger:latest}"
-KEYRING_DIR="${KEYRING_DIR:-$PWD/.regen_keyring}"
+# Neutron CLI wrapper: use Docker image
+NEUTRON_IMAGE="${NEUTRON_IMAGE:-neutron-node}"
+KEYRING_DIR="${KEYRING_DIR:-$PWD/.neutron_keyring}"
 mkdir -p "$KEYRING_DIR"
 
-rg() {
-  if [ -n "${REGEN_BIN:-}" ] && [ -x "$REGEN_BIN" ]; then
-    HOME="$KEYRING_DIR" LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-$PWD}" "$REGEN_BIN" "$@"
-  elif command -v regen >/dev/null; then
-    regen "$@"
-  else
-    docker run --rm -e HOME=/home/regen -u "$(id -u):$(id -g)" \
-      -v "$KEYRING_DIR":/home/regen/.regen \
-      -v "$PWD":/work -w /work "$REGEN_IMAGE" \
-      regen "$@"
-  fi
-}
+nd() {
+   docker run --rm -e HOME=/home/neutron -u "$(id -u):$(id -g)" \
+     --network neutron-testing \
+     -v "$KEYRING_DIR":/home/neutron/.neutron \
+     -v "$PWD":/work -w /work "$NEUTRON_IMAGE" \
+     neutrond "$@"
+ }
 # Optional common args (e.g., --keyring-backend test)
-RG_ARGS="${RG_ARGS:-}"
+RG_ARGS="--keyring-backend test --keyring-dir /home/neutron/.neutron"
 
 # jq required locally
 if ! command -v jq >/dev/null; then
@@ -55,7 +50,7 @@ else
   docker run --rm -v "$(pwd)":/code \
     --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
     --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-    cosmwasm/workspace-optimizer:0.12.6
+    cosmwasm/workspace-optimizer:0.16.0
 fi
 
 echo "Verifying contract artifacts..."
@@ -76,19 +71,19 @@ if [ -f "$ART_DIR/cw20_base.wasm" ]; then
 fi
 
 echo "Storing Regen contracts..."
-MAIN_CONTRACT_CODE_ID=$(rg $RG_ARGS tx wasm store artifacts/regen_liquid_staking.wasm \
+MAIN_CONTRACT_CODE_ID=$(nd $RG_ARGS tx wasm store artifacts/regen_liquid_staking.wasm \
   --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-  --gas auto --gas-adjustment 1.3 --broadcast-mode block --output json | \
+  --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 --output json | \
   jq -r '.logs[0].events[] | select(.type=="store_code") | .attributes[] | select(.key=="code_id") | .value')
 
-VALIDATOR_CONTRACT_CODE_ID=$(rg $RG_ARGS tx wasm store artifacts/regen_validators.wasm \
+VALIDATOR_CONTRACT_CODE_ID=$(nd $RG_ARGS tx wasm store artifacts/regen_validators.wasm \
   --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-  --gas auto --gas-adjustment 1.3 --broadcast-mode block --output json | \
+  --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 --output json | \
   jq -r '.logs[0].events[] | select(.type=="store_code") | .attributes[] | select(.key=="code_id") | .value')
 
-REWARDS_CONTRACT_CODE_ID=$(rg $RG_ARGS tx wasm store artifacts/regen_rewards.wasm \
+REWARDS_CONTRACT_CODE_ID=$(nd $RG_ARGS tx wasm store artifacts/regen_rewards.wasm \
   --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-  --gas auto --gas-adjustment 1.3 --broadcast-mode block --output json | \
+  --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 --output json | \
   jq -r '.logs[0].events[] | select(.type=="store_code") | .attributes[] | select(.key=="code_id") | .value')
 
 echo "Code IDs => main:$MAIN_CONTRACT_CODE_ID validators:$VALIDATOR_CONTRACT_CODE_ID rewards:$REWARDS_CONTRACT_CODE_ID"
@@ -102,24 +97,24 @@ cat > instantiate_msg.json <<'EOF'
   "max_validators": 20,
   "min_delegation": "1000000",
   "validators": [
-    { "address": "regenvaloper1n3mhyp9fvcmuu8l0q8qvjy07x0rql8q4ucmxys", "weight": "0.2" },
-    { "address": "regenvaloper1ss2f0nl7sn42x8x0d337mj9welzml8h0f5erue", "weight": "0.2" },
-    { "address": "regenvaloper1ceunjpth8nds7sfmfd9yjmh97vxmuzth4z4gkmmgvjdxfdz", "weight": "0.2" },
-    { "address": "regenvaloper1vys9dreue4e8xrga2zmuzth4z4gkmmgvjdxfdz", "weight": "0.2" },
-    { "address": "regenvaloper105g89nqllu33nend0ce5eup4zxn0d4kfr2v7w8", "weight": "0.2" }
+    { "address": "neutronvaloper1m9l358xunhhwds0568za49mzhvuxx9ux8xafx2", "weight": "1.0" }
   ]
 }
 EOF
 
-ADMIN_ADDR=$(rg $RG_ARGS keys show "$DEPLOYER_KEY" -a)
+if ! nd $RG_ARGS keys show "$DEPLOYER_KEY" -a >/dev/null 2>&1; then
+  echo "Creating key $DEPLOYER_KEY"
+  nd $RG_ARGS keys add "$DEPLOYER_KEY" --yes
+fi
+ADMIN_ADDR=$(nd $RG_ARGS keys show "$DEPLOYER_KEY" -a)
 jq --arg admin "$ADMIN_ADDR" '.admin=$admin' instantiate_msg.json > instantiate_msg.tmp && mv instantiate_msg.tmp instantiate_msg.json
 
 echo "Instantiating main contract..."
-CONTRACT_ADDRESS=$(rg $RG_ARGS tx wasm instantiate "$MAIN_CONTRACT_CODE_ID" \
+CONTRACT_ADDRESS=$(nd $RG_ARGS tx wasm instantiate "$MAIN_CONTRACT_CODE_ID" \
   "$(cat instantiate_msg.json)" \
   --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-  --gas auto --gas-adjustment 1.3 --broadcast-mode block \
-  --label "Regen Liquid Staking v1.0" \
+  --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 \
+  --label "Neutron Liquid Staking v1.0" \
   --admin "$ADMIN_ADDR" \
   --output json | jq -r '.logs[0].events[] | select(.type=="instantiate") | .attributes[] | select(.key=="_contract_address") | .value')
 
@@ -129,17 +124,17 @@ CW20_CODE_ID=""
 CW20_ADDRESS=""
 if [ -f artifacts/cw20_base.wasm ]; then
   echo "Storing cw20-base code..."
-  CW20_CODE_ID=$(rg $RG_ARGS tx wasm store artifacts/cw20_base.wasm \
+  CW20_CODE_ID=$(nd $RG_ARGS tx wasm store artifacts/cw20_base.wasm \
     --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-    --gas auto --gas-adjustment 1.3 --broadcast-mode block --output json | \
+    --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 --output json | \
     jq -r '.logs[0].events[] | select(.type=="store_code") | .attributes[] | select(.key=="code_id") | .value')
   echo "cw20-base code id: $CW20_CODE_ID"
 
-  echo "Instantiating dREGEN cw20 with minter set to main contract..."
+  echo "Instantiating dNTRN cw20 with minter set to main contract..."
   cat > cw20_instantiate.json <<CW
 {
-  "name": "dREGEN",
-  "symbol": "dREGEN",
+  "name": "dNTRN",
+  "symbol": "dNTRN",
   "decimals": 6,
   "initial_balances": [],
   "mint": { "minter": "$CONTRACT_ADDRESS" },
@@ -147,20 +142,20 @@ if [ -f artifacts/cw20_base.wasm ]; then
 }
 CW
 
-  CW20_ADDRESS=$(rg $RG_ARGS tx wasm instantiate "$CW20_CODE_ID" \
+  CW20_ADDRESS=$(nd $RG_ARGS tx wasm instantiate "$CW20_CODE_ID" \
     "$(cat cw20_instantiate.json)" \
     --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-    --gas auto --gas-adjustment 1.3 --broadcast-mode block \
-    --label "dREGEN CW20" \
+    --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 \
+    --label "dNTRN CW20" \
     --admin "$ADMIN_ADDR" \
     --output json | jq -r '.logs[0].events[] | select(.type=="instantiate") | .attributes[] | select(.key=="_contract_address") | .value')
-  echo "dREGEN cw20 deployed at: $CW20_ADDRESS"
+  echo "dNTRN cw20 deployed at: $CW20_ADDRESS"
 
   echo "Updating main contract config with dregen_token..."
-  rg $RG_ARGS tx wasm execute "$CONTRACT_ADDRESS" \
+  nd $RG_ARGS tx wasm execute "$CONTRACT_ADDRESS" \
     "{\"update_config\":{\"dregen_token\":\"$CW20_ADDRESS\"}}" \
     --from "$DEPLOYER_KEY" --chain-id "$CHAIN_ID" --node "$NODE_URL" \
-    --gas auto --gas-adjustment 1.3 --broadcast-mode block -y
+    --fees 250000untrn,250000ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 --gas 100000000 -y
 fi
 
 cat > deployment_info.json <<EOF

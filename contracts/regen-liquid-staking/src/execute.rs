@@ -406,6 +406,7 @@ pub fn execute_update_config(
     admin: Option<String>,
     fee_rate: Option<Decimal>,
     max_validators: Option<u32>,
+    dregen_token: Option<String>,
 ) -> Result<Response, ContractError> {
     let mut config = CONFIG.load(deps.storage)?;
     if info.sender != config.admin {
@@ -423,6 +424,9 @@ pub fn execute_update_config(
     }
     if let Some(mv) = max_validators {
         config.max_validators = mv;
+    }
+    if let Some(tok) = dregen_token {
+        config.dregen_token = deps.api.addr_validate(&tok)?;
     }
 
     CONFIG.save(deps.storage, &config)?;

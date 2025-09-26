@@ -76,6 +76,8 @@ The script:
 - Runs cosmwasm-check
 - Stores the main, validators, and rewards contract code
 - Instantiates the main contract with a validator set
+- Stores and instantiates cw20-base (dREGEN) with the main contract as minter
+- Updates the main contract config.dregen_token to the cw20 address
 - Outputs deployment_info.json with code IDs and addresses
 
 Adjust the validators list in the script or pass your own instantiate JSON if desired.
@@ -139,7 +141,7 @@ Entities live in [`indexer/src/entities.ts`](../indexer/src/entities.ts) and log
 - Fee rate guardrails: max 20% in instantiate/update (see [`contracts/regen-liquid-staking/src/contract.rs`](../contracts/regen-liquid-staking/src/contract.rs)).
 - Pause/Resume for emergencies (admin-only).
 - Rebalance is a placeholder for operator-driven delegation adjustments (see [`contracts/regen-liquid-staking/src/execute.rs`](../contracts/regen-liquid-staking/src/execute.rs)).
-- CW20 dREGEN integration is expected to be set in config.dregen_token; you may instantiate CW20 separately and update via UpdateConfig.
+- CW20 dREGEN integration is expected to be set in config.dregen_token; you may instantiate CW20 separately and set it at instantiate (InstantiateMsg.dregen_token) or update later via UpdateConfig.dregen_token.
 
 ## 11) Troubleshooting
 
